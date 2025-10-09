@@ -154,17 +154,6 @@ class GrpcMessageReceiver {
     this.isConnected = false;
     console.log("Disconnected from gRPC broker");
   }
-
-  /**
-   * Get receiver statistics
-   */
-  getStats() {
-    return {
-      ...this.stats,
-      isConnected: this.isConnected,
-      receiverId: this.receiverId,
-    };
-  }
 }
 
 if (require.main === module) {

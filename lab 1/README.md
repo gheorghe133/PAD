@@ -13,26 +13,32 @@ The system consists of three main components implementing **Publisher/Subscriber
 
 ### Part 1: TCP Sockets with Topics
 ```
-┌─────────┐   publish to    ┌─────────┐   forward to   ┌─────────────┐
-│ Sender  │ ──"topic1"────▶ │ Broker  │ ──subscribers─▶│ Receiver1   │
-└─────────┘                 │         │                │ (topic1)    │
-                            │         │                └─────────────┘
-┌─────────┐   publish to    │         │   forward to   ┌─────────────┐
-│ Sender2 │ ──"topic2"────▶ │         │ ──subscribers─▶│ Receiver2   │
-└─────────┘                 └─────────┘                │ (topic1,2)  │
-                                                       └─────────────┘
+                            ┌─────────────┐
+                         ┌─▶│ Receiver1   │
+                         │  │ (news)      │
+┌─────────┐ multiple     │  └─────────────┘
+│ Sender  │ topics    ┌─────────┐
+│         │──────────▶│ Broker  │
+└─────────┘           └─────────┘
+                         │  ┌─────────────┐
+                         └─▶│ Receiver2   │
+                            │ (news,sport)│
+                            └─────────────┘
 ```
 
 ### Part 2: gRPC with Topics
 ```
-┌─────────┐     gRPC        ┌─────────┐     gRPC       ┌─────────────┐
-│ Sender  │ ──topic+msg───▶ │ Broker  │ ──streaming──▶ │ Receiver1   │
-└─────────┘   (Protobuf)    │         │   (Protobuf)   │ (subscribed)│
-                            │         │                └─────────────┘
-┌─────────┐     gRPC        │         │     gRPC       ┌─────────────┐
-│ Sender2 │ ──topic+msg───▶ │         │ ──streaming──▶ │ Receiver2   │
-└─────────┘   (Protobuf)    └─────────┘   (Protobuf)   │ (subscribed)│
-                                                       └─────────────┘
+                            ┌─────────────┐
+                         ┌─▶│ Receiver1   │◀─┐
+                         │  │ (news)      │  │ gRPC
+┌─────────┐ gRPC         │  └─────────────┘  │ streaming
+│ Sender  │ multiple  ┌─────────┐            │
+│         │ topics ──▶│ Broker  │            │
+└─────────┘ (Protobuf)└─────────┘            │
+                         │  ┌─────────────┐  │
+                         └─▶│ Receiver2   │◀─┘
+                            │ (news,sport)│
+                            └─────────────┘
 ```
 
 ## Requirements Met
@@ -40,11 +46,13 @@ The system consists of three main components implementing **Publisher/Subscriber
 ✅ **Publisher/Subscriber pattern**: Topic-based message routing
 ✅ **Topic subscriptions**: Receivers subscribe to specific topics
 ✅ **Multiple subscribers**: Multiple receivers can subscribe to same topic
+✅ **Single sender architecture**: One sender publishes to multiple topics
 ✅ **TCP sockets** (Part 1): Reliable communication protocol
 ✅ **gRPC** (Part 2): High-level RPC with Protocol Buffers
 ✅ **JSON/Protobuf formats**: Human-readable and efficient structures
 ✅ **Topic-based routing**: Messages delivered only to subscribed receivers
-✅ **Concurrent handling**: Each client connection handled separately
+✅ **Concurrent handling**: Each receiver connection handled separately
+✅ **Dynamic topics**: Topics are created automatically when used
 
 ## Installation
 
@@ -170,9 +178,16 @@ message MessageRequest {
 - `BROKER_HOST` / `GRPC_HOST`: Broker hostname (default: localhost)
 - `BROKER_TCP_PORT`: TCP port (default: 8080)
 - `GRPC_PORT`: gRPC port (default: 50051)
-- `SENDER_ID`: Sender identifier
-- `RECEIVER_ID`: Receiver identifier
+- `SENDER_ID`: Sender identifier (auto-generated if not specified)
+- `RECEIVER_ID`: Receiver identifier (auto-generated if not specified)
 - `TOPICS`: Comma-separated list of topics for receiver (default: general)
+
+### Topic System
+- **Dynamic Topics**: Any topic name can be used - no predefined list
+- **Default Topic**: "general" is used when no topic is specified
+- **Topic Format**: Use `"topic:message"` format or just `"message"` for default topic
+- **Subscription**: Receivers specify topics via `TOPICS=news,sports,tech` environment variable
+- **Routing**: Messages are only delivered to receivers subscribed to that specific topic
 
 ## Key Differences
 
@@ -222,22 +237,49 @@ npm run start:sender
 # Then type: tech:New technology released! (no subscribers)
 ```
 
-### 2. Multiple receivers example
+### 2. Multiple receivers with different topic subscriptions
 ```bash
 # Terminal 1: Broker
 npm run start:broker
 
-# Terminal 2: News receiver
+# Terminal 2: News receiver (only news)
 TOPICS=news RECEIVER_ID=news_receiver npm run start:receiver
 
-# Terminal 3: Sports receiver
+# Terminal 3: Sports receiver (only sports)
 TOPICS=sports RECEIVER_ID=sports_receiver npm run start:receiver
 
-# Terminal 4: General receiver (all topics)
+# Terminal 4: General receiver (multiple topics)
 TOPICS=news,sports,general RECEIVER_ID=all_receiver npm run start:receiver
 
-# Terminal 5: Send messages to different topics
+# Terminal 5: Single sender publishing to different topics
 npm run start:sender
+# Then type: news:Breaking news!     → goes to news_receiver and all_receiver
+# Then type: sports:Goal scored!     → goes to sports_receiver and all_receiver
+# Then type: general:Hello everyone! → goes only to all_receiver
+# Then type: tech:New gadget!        → no subscribers (error message)
 ```
+
+### 3. Testing topic-based routing
+```bash
+# Start broker and receivers as above, then test:
+
+# Send to existing topic with subscribers
+node src/part1/sender.js --message "news:Important update!"
+
+# Send to topic with no subscribers
+node src/part1/sender.js --message "weather:Sunny day!"
+
+# Send without topic (uses default "general")
+node src/part1/sender.js --message "Hello World!"
+```
+
+## Key Features
+
+- **Single Sender Architecture**: One sender can publish to multiple topics
+- **Dynamic Topic Creation**: Topics are created automatically when first used
+- **Flexible Subscriptions**: Receivers can subscribe to any combination of topics
+- **Topic-based Filtering**: Messages only reach subscribed receivers
+- **Automatic ID Generation**: Unique IDs generated automatically for senders and receivers
+- **Error Handling**: Clear error messages for invalid topics or no subscribers
 
 This implementation demonstrates both low-level socket programming and high-level RPC communication with **Publisher/Subscriber pattern**, meeting all lab requirements for maximum grade.

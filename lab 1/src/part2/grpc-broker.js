@@ -241,17 +241,6 @@ class GrpcMessageBroker {
       });
     });
   }
-
-  /**
-   * Get broker statistics
-   */
-  getStats() {
-    return {
-      ...this.stats,
-      senderConnected: !!this.senderClient,
-      receiverConnected: !!this.receiverStream,
-    };
-  }
 }
 
 if (require.main === module) {
