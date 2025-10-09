@@ -1,0 +1,27 @@
+{
+  "name": "message-broker-lab",
+  "version": "1.0.0",
+  "description": "Message Broker implementation with Sockets and gRPC for PAD Lab 1",
+  "main": "src/part1/broker.js",
+  "scripts": {
+    "start:broker": "node src/part1/broker.js",
+    "start:sender": "node src/part1/sender.js",
+    "start:receiver": "node src/part1/receiver.js",
+    "start:grpc-broker": "node src/part2/grpc-broker.js",
+    "start:grpc-sender": "node src/part2/grpc-sender.js",
+    "start:grpc-receiver": "node src/part2/grpc-receiver.js"
+  },
+  "keywords": [
+    "message-broker",
+    "sockets",
+    "tcp",
+    "grpc",
+    "rpc"
+  ],
+  "author": "Student",
+  "license": "MIT",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.9.0",
+    "@grpc/proto-loader": "^0.7.0"
+  }
+}
