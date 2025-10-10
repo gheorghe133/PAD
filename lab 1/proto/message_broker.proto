@@ -2,26 +2,20 @@ syntax = "proto3";
 
 package messagebroker;
 
-// Service definition for the Message Broker
 service MessageBroker {
-  // Register a client (sender or receiver)
   rpc RegisterClient(RegisterRequest) returns (RegisterResponse);
   
-  // Send a message from sender to broker
   rpc SendMessage(MessageRequest) returns (MessageResponse);
   
-  // Receive messages for a receiver (streaming)
   rpc ReceiveMessages(ReceiveRequest) returns (stream Message);
   
-  // Send acknowledgment for received message
   rpc AckMessage(AckRequest) returns (AckResponse);
 }
 
-// Client registration
 message RegisterRequest {
-  string client_type = 1; // "sender" or "receiver"
+  string client_type = 1; 
   string client_id = 2;
-  repeated string topics = 3; // topics to subscribe to (for receivers)
+  repeated string topics = 3; 
 }
 
 message RegisterResponse {
@@ -30,7 +24,6 @@ message RegisterResponse {
   string assigned_id = 3;
 }
 
-// Message sending
 message MessageRequest {
   string id = 1;
   string sender = 2;
@@ -45,7 +38,6 @@ message MessageResponse {
   string message_id = 3;
 }
 
-// Message receiving
 message ReceiveRequest {
   string receiver_id = 1;
 }
@@ -58,7 +50,6 @@ message Message {
   int64 timestamp = 5;
 }
 
-// Acknowledgment
 message AckRequest {
   string message_id = 1;
   string receiver_id = 2;
