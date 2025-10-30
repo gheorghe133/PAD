@@ -1,0 +1,50 @@
+{
+  "name": "web-proxy-lab",
+  "version": "1.0.0",
+  "description": "Web Proxy Lab - Data Warehouse and Reverse Proxy Implementation",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "start:warehouse": "node src/warehouse/server.js",
+    "start:proxy": "node src/proxy/server.js",
+    "start:client": "node src/client/client.js",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:client": "node src/client/client.js",
+    "dev:warehouse": "nodemon src/warehouse/server.js",
+    "dev:proxy": "nodemon src/proxy/server.js"
+  },
+  "keywords": [
+    "http",
+    "proxy",
+    "data-warehouse",
+    "load-balancing",
+    "caching",
+    "distributed-systems"
+  ],
+  "author": "PAD Lab Student",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.6",
+    "redis": "^4.6.10",
+    "cassandra-driver": "^4.7.2",
+    "xml2js": "^0.6.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "uuid": "^9.0.1",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "nodemon": "^3.0.1",
+    "@types/jest": "^29.5.8"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
