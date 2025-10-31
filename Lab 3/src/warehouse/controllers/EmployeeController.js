@@ -1,6 +1,7 @@
-const EmployeeService = require("../services/EmployeeService");
-const responseFormatter = require("../../utils/responseFormatter");
 const logger = require("../../utils/logger");
+const responseFormatter = require("../../utils/responseFormatter");
+
+const EmployeeService = require("../services/EmployeeService");
 
 class EmployeeController {
   constructor() {

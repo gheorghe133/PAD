@@ -92,38 +92,6 @@ class Employee {
     };
   }
 
-  toJSON() {
-    return JSON.stringify(this.toObject());
-  }
-
-  static fromObject(data) {
-    return new Employee(data);
-  }
-
-  static fromJSON(json) {
-    try {
-      const data = JSON.parse(json);
-      return new Employee(data);
-    } catch (error) {
-      throw new Error(`Invalid JSON: ${error.message}`);
-    }
-  }
-
-  getFullName() {
-    return `${this.firstName} ${this.lastName}`.trim();
-  }
-
-  isEmployeeActive() {
-    return this.isActive === true;
-  }
-
-  getYearsOfService() {
-    const hireDate = new Date(this.hireDate);
-    const now = new Date();
-    const diffTime = Math.abs(now - hireDate);
-    const diffYears = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365.25));
-    return diffYears;
-  }
 }
 
 module.exports = Employee;

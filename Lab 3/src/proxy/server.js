@@ -1,15 +1,16 @@
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
 const compression = require("compression");
+const cors = require("cors");
+const express = require("express");
+const helmet = require("helmet");
 const morgan = require("morgan");
 
 const config = require("../config/config");
 const logger = require("../utils/logger");
 const responseFormatter = require("../utils/responseFormatter");
+
 const CacheManager = require("./cache/CacheManager");
-const RoundRobinBalancer = require("./loadbalancer/RoundRobinBalancer");
 const ConnectionManager = require("./connections/ConnectionManager");
+const RoundRobinBalancer = require("./loadbalancer/RoundRobinBalancer");
 
 class ReverseProxyServer {
   constructor() {

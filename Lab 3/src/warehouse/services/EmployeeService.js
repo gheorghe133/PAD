@@ -1,6 +1,7 @@
+const logger = require("../../utils/logger");
+
 const Employee = require("../models/Employee");
 const ThreadSafeStorage = require("../storage/ThreadSafeStorage");
-const logger = require("../../utils/logger");
 
 class EmployeeService {
   constructor() {
@@ -244,10 +245,6 @@ class EmployeeService {
       });
       throw error;
     }
-  }
-
-  async getEmployeesByDepartment(department) {
-    return this.searchEmployees({ department });
   }
 
   async getStatistics() {

@@ -36,14 +36,6 @@ class ResponseFormatter {
     }
   }
 
-  toJSON(data) {
-    try {
-      return JSON.stringify(data, null, 2);
-    } catch (error) {
-      throw new Error(`JSON conversion failed: ${error.message}`);
-    }
-  }
-
   getPreferredContentType(acceptHeader) {
     if (!acceptHeader) {
       return "application/json";

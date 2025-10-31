@@ -1,19 +1,45 @@
 const axios = require("axios");
+const http = require("http");
+const https = require("https");
+
 const config = require("../../config/config");
 const logger = require("../../utils/logger");
 
+const axiosInstance = axios.create({
+  timeout: 30000,
+  maxRedirects: 5,
+  validateStatus: () => true,
+  httpsAgent: new https.Agent({
+    rejectUnauthorized: false,
+    keepAlive: true,
+    maxSockets: 50,
+  }),
+  httpAgent: new http.Agent({
+    keepAlive: true,
+    maxSockets: 50,
+  }),
+});
+
 class RoundRobinBalancer {
   constructor(servers = config.warehouseServers) {
-    this.servers = servers.map((server) => ({
-      ...server,
-      url: `http://${server.host}:${server.port}`,
-      isHealthy: true,
-      lastHealthCheck: null,
-      consecutiveFailures: 0,
-      totalRequests: 0,
-      successfulRequests: 0,
-      averageResponseTime: 0,
-    }));
+    this.servers = servers.map((server) => {
+      const protocol = server.port === 443 ? "https" : "http";
+      const portSuffix =
+        (protocol === "https" && server.port === 443) ||
+        (protocol === "http" && server.port === 80)
+          ? ""
+          : `:${server.port}`;
+      return {
+        ...server,
+        url: `${protocol}://${server.host}${portSuffix}`,
+        isHealthy: true,
+        lastHealthCheck: null,
+        consecutiveFailures: 0,
+        totalRequests: 0,
+        successfulRequests: 0,
+        averageResponseTime: 0,
+      };
+    });
 
     this.currentIndex = 0;
     this.healthCheckInterval = null;
@@ -69,8 +95,6 @@ class RoundRobinBalancer {
         method: req.method,
         url: `${server.url}${req.originalUrl || req.url}`,
         headers: this.prepareHeaders(req),
-        timeout: config.loadBalancer.maxRetries * 1000,
-        validateStatus: () => true,
       };
 
       if (req.method !== "GET" && req.body) {
@@ -83,7 +107,7 @@ class RoundRobinBalancer {
         serverUrl: server.url,
       });
 
-      const response = await axios(requestConfig);
+      const response = await axiosInstance(requestConfig);
       const responseTime = Date.now() - startTime;
 
       this.updateServerStats(server, true, responseTime);
@@ -119,6 +143,8 @@ class RoundRobinBalancer {
         method: req.method,
         url: `${server.url}${req.originalUrl || req.url}`,
         error: error.message,
+        errorCode: error.code,
+        errorResponse: error.response?.status,
         responseTime: `${responseTime}ms`,
       });
 
@@ -209,7 +235,7 @@ class RoundRobinBalancer {
 
   async checkServerHealth(server) {
     try {
-      const response = await axios.get(`${server.url}/health`, {
+      const response = await axiosInstance.get(`${server.url}/health`, {
         timeout: config.loadBalancer.healthCheckTimeout,
       });
 
@@ -230,6 +256,7 @@ class RoundRobinBalancer {
         logger.warn("Server health check failed", {
           url: server.url,
           error: error.message,
+          errorCode: error.code,
         });
       }
     }
@@ -263,40 +290,6 @@ class RoundRobinBalancer {
         lastHealthCheck: server.lastHealthCheck,
       })),
     };
-  }
-
-  addServer(serverConfig) {
-    const server = {
-      ...serverConfig,
-      url: `http://${serverConfig.host}:${serverConfig.port}`,
-      isHealthy: true,
-      lastHealthCheck: null,
-      consecutiveFailures: 0,
-      totalRequests: 0,
-      successfulRequests: 0,
-      averageResponseTime: 0,
-    };
-
-    this.servers.push(server);
-
-    logger.info("Server added to load balancer", { url: server.url });
-  }
-
-  removeServer(url) {
-    const index = this.servers.findIndex((server) => server.url === url);
-
-    if (index !== -1) {
-      this.servers.splice(index, 1);
-
-      if (this.currentIndex >= this.servers.length) {
-        this.currentIndex = 0;
-      }
-
-      logger.info("Server removed from load balancer", { url });
-      return true;
-    }
-
-    return false;
   }
 
   stopHealthChecks() {

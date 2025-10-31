@@ -12,12 +12,12 @@ class TestClient {
 
     try {
       const response = await axios.get(`${this.warehouseUrl}/employees`);
-      console.log("✅ Direct connection successful");
+      console.log("[PASS] Direct connection successful");
       console.log(`Status: ${response.status}`);
       console.log(`Employees count: ${response.data.data.length}`);
       console.log(`Response time: ${response.headers["x-response-time"]}`);
     } catch (error) {
-      console.log("❌ Direct connection failed:", error.message);
+      console.log("[FAIL] Direct connection failed:", error.message);
     }
   }
 
@@ -26,7 +26,7 @@ class TestClient {
 
     try {
       const response = await axios.get(`${this.proxyUrl}/employees`);
-      console.log("✅ Proxy connection successful");
+      console.log("[PASS] Proxy connection successful");
       console.log(`Status: ${response.status}`);
       console.log(`Employees count: ${response.data.data.length}`);
       console.log(`Response time: ${response.headers["x-response-time"]}`);
@@ -34,7 +34,7 @@ class TestClient {
       console.log(`Connection ID: ${response.headers["x-connection-id"]}`);
       console.log(`Proxy server: ${response.headers["x-proxy-server"]}`);
     } catch (error) {
-      console.log("❌ Proxy connection failed:", error.message);
+      console.log("[FAIL] Proxy connection failed:", error.message);
     }
   }
 
@@ -57,9 +57,9 @@ class TestClient {
       console.log(`Response time: ${response2.headers["x-response-time"]}`);
       console.log(`Cache age: ${response2.headers["x-cache-age"]} seconds`);
 
-      console.log("✅ Caching test completed");
+      console.log("[PASS] Caching test completed");
     } catch (error) {
-      console.log("❌ Caching test failed:", error.message);
+      console.log("[FAIL] Caching test failed:", error.message);
     }
   }
 
@@ -83,11 +83,11 @@ class TestClient {
         console.log(`Request ${i + 1}: Server ${server}`);
       }
 
-      console.log(`✅ Load balancing test completed`);
+      console.log(`[PASS] Load balancing test completed`);
       console.log(`Unique servers used: ${servers.size}`);
       console.log(`Servers: ${Array.from(servers).join(", ")}`);
     } catch (error) {
-      console.log("❌ Load balancing test failed:", error.message);
+      console.log("[FAIL] Load balancing test failed:", error.message);
     }
   }
 
@@ -99,11 +99,11 @@ class TestClient {
         headers: { Accept: "application/xml" },
       });
 
-      console.log("✅ XML format test successful");
+      console.log("[PASS] XML format test successful");
       console.log(`Content-Type: ${response.headers["content-type"]}`);
       console.log("Response preview:", response.data.substring(0, 200) + "...");
     } catch (error) {
-      console.log("❌ XML format test failed:", error.message);
+      console.log("[FAIL] XML format test failed:", error.message);
     }
   }
 
@@ -122,14 +122,14 @@ class TestClient {
       });
 
       const employeeId = createResponse.data.data.id;
-      console.log(`✅ Employee created with ID: ${employeeId}`);
+      console.log(`[PASS] Employee created with ID: ${employeeId}`);
 
       console.log("Reading employee...");
       const readResponse = await axios.get(
         `${this.proxyUrl}/employees/${employeeId}`
       );
       console.log(
-        `✅ Employee read: ${readResponse.data.data.firstName} ${readResponse.data.data.lastName}`
+        `[PASS] Employee read: ${readResponse.data.data.firstName} ${readResponse.data.data.lastName}`
       );
 
       console.log("Updating employee...");
@@ -141,16 +141,16 @@ class TestClient {
         }
       );
       console.log(
-        `✅ Employee updated: Salary ${updateResponse.data.data.salary}`
+        `[PASS] Employee updated: Salary ${updateResponse.data.data.salary}`
       );
 
       console.log("Deleting employee...");
       await axios.delete(`${this.proxyUrl}/employees/${employeeId}`);
-      console.log(`✅ Employee deleted`);
+      console.log(`[PASS] Employee deleted`);
 
-      console.log("✅ CRUD operations test completed");
+      console.log("[PASS] CRUD operations test completed");
     } catch (error) {
-      console.log("❌ CRUD operations test failed:", error.message);
+      console.log("[FAIL] CRUD operations test failed:", error.message);
     }
   }
 
@@ -159,17 +159,17 @@ class TestClient {
 
     try {
       const response = await axios.get(`${this.proxyUrl}/proxy/stats`);
-      console.log("✅ Proxy statistics retrieved");
+      console.log("[PASS] Proxy statistics retrieved");
       console.log("Cache stats:", response.data.cache);
       console.log("Load balancer stats:", response.data.loadBalancer);
       console.log("Connection stats:", response.data.connections);
     } catch (error) {
-      console.log("❌ Proxy statistics test failed:", error.message);
+      console.log("[FAIL] Proxy statistics test failed:", error.message);
     }
   }
 
   async runAllTests() {
-    console.log("🚀 Starting Web Proxy Lab Tests");
+    console.log("[START] Starting Web Proxy Lab Tests");
     console.log(`Proxy URL: ${this.proxyUrl}`);
     console.log(`Warehouse URL: ${this.warehouseUrl}`);
 
@@ -181,7 +181,7 @@ class TestClient {
     await this.testCRUDOperations();
     await this.testProxyStatistics();
 
-    console.log("\n🎉 All tests completed!");
+    console.log("\n[DONE] All tests completed!");
   }
 
   async performanceTest(requests = 100) {
@@ -220,7 +220,9 @@ class TestClient {
           successful.length
         : 0;
 
-    console.log(`✅ Performance test completed in ${endTime - startTime}ms`);
+    console.log(
+      `[PASS] Performance test completed in ${endTime - startTime}ms`
+    );
     console.log(`Total requests: ${requests}`);
     console.log(`Successful: ${successful.length}`);
     console.log(`Failed: ${failed.length}`);
@@ -236,7 +238,8 @@ class TestClient {
 }
 
 if (require.main === module) {
-  const client = new TestClient();
+  const productionProxyUrl = "https://reverse-proxy-server.up.railway.app";
+  const client = new TestClient(productionProxyUrl);
 
   const args = process.argv.slice(2);
   const testType = args[0] || "all";

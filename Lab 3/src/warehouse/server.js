@@ -1,11 +1,12 @@
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
 const compression = require("compression");
+const cors = require("cors");
+const express = require("express");
+const helmet = require("helmet");
 const morgan = require("morgan");
 
 const config = require("../config/config");
 const logger = require("../utils/logger");
+
 const EmployeeController = require("./controllers/EmployeeController");
 
 class DataWarehouseServer {
