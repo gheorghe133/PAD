@@ -276,21 +276,23 @@ Railway will automatically detect the Node.js application and deploy using the P
 
 ### Project Overview
 
-![Railway Project Dashboard]()
+<img width="1435" height="825" alt="Screenshot 2025-10-31 at 20 00 30" src="https://github.com/user-attachments/assets/19a019a1-f4c6-48f9-925f-4539e1930969" />
 
 ### Service Deployments
 
-![Data Warehouse Deployment]()
+**Data Warehouse Deployment**
+<img width="1446" height="824" alt="Screenshot 2025-10-31 at 20 01 21" src="https://github.com/user-attachments/assets/685eb205-2411-4fc4-bed3-ecfd3ea9f117" />
 
-![Reverse Proxy Deployment]()
+**Reverse Proxy Deployment**
+<img width="1447" height="787" alt="Screenshot 2025-10-31 at 20 01 06" src="https://github.com/user-attachments/assets/43143bf5-2f13-4341-b1d6-cd3282c64d41" />
 
 ### Environment Variables
-
-![Environment Configuration]()
+<img width="1445" height="828" alt="Screenshot 2025-10-31 at 20 01 59" src="https://github.com/user-attachments/assets/7925e1a4-83b3-4deb-9b4a-1c48abab0ab1" />
+<img width="1425" height="789" alt="Screenshot 2025-10-31 at 20 01 45" src="https://github.com/user-attachments/assets/084933df-2450-435b-ba03-04b70ee57484" />
 
 ### Deployment Logs
-
-![Deployment Logs]()
+<img width="1448" height="822" alt="Screenshot 2025-10-31 at 20 02 32" src="https://github.com/user-attachments/assets/732c404e-dae2-44fe-8020-4235a41dec58" />
+<img width="1449" height="824" alt="Screenshot 2025-10-31 at 20 02 17" src="https://github.com/user-attachments/assets/56d432ac-523d-4b88-a117-6e5e8492e427" />
 
 
 ## Local Development
